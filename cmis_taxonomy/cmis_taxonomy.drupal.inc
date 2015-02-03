@@ -47,6 +47,8 @@ function cmis_taxonomy_lookup(&$node, $field_name = 'tags', $field_value = NULL)
               $node->{$field_name}[LANGUAGE_NONE][$key]['tid'] = $value;
             }
           }
+          else
+            $node->{$field_name}[LANGUAGE_NONE][0]['tid'] = $terms[$vids[$k]];
         }
       }
       else if(is_array($vids) && !empty($vids)) {
@@ -62,6 +64,8 @@ function cmis_taxonomy_lookup(&$node, $field_name = 'tags', $field_value = NULL)
                   $node->{$field_name}[LANGUAGE_NONE][$key]['tid'] = $value;
                 }
               }
+              else
+                $node->{$field_name}[LANGUAGE_NONE][0]['tid'] = $terms[$vids[$k]];
             }
           }
         }
