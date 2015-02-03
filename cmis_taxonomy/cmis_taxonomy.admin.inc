@@ -20,7 +20,7 @@ function cmis_taxonomy_vocabulary(){
     array('data' => 'Vocabulary', 'field' => 'cmis_vname', 'sort' => 'ASC'),
     array('data' => 'CMIS Repository', 'field' => 'cmis_repositoryId', 'sort' => 'ASC'),
     array('data' => 'CMIS Cat ObjectID', 'field' => 'cmis_objectId', 'sort' => 'ASC'),
-    array('data' => 'Enabled', 'field' => 'cmis_exclude', 'sort' => 'ASC'),
+    array('data' => 'Excluded', 'field' => 'cmis_exclude', 'sort' => 'ASC'),
     array('data' => 'Timestamp', 'field' => 'timestamp', 'sort' => 'ASC'),
   );
   $query = db_select('cmis_vocab', 'p')->extend('PagerDefault')->extend('TableSort');
