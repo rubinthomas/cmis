@@ -1,5 +1,5 @@
 7.x-2.x (dev)
-Added cmis_taxonomy to support tags/categories present in CMIS to map to Drupal Taxonomy based on Vocabulary mapping
+Added Taxonomy Support for CMIS using Alfresco as example, see README.txt for more information
 
 7.x-2.0 (dev)
 Removed PHP CMIS Library, it should now be loaded as an external library in the libraries folder, see README.txt for more information
