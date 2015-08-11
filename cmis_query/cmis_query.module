@@ -9,14 +9,12 @@
  * Implementation of hook_menu() for CMIS search module.
  */
 function cmis_query_menu() {
-  $items = array();
   $items['cmis/query'] = array(
     'type' => MENU_NORMAL_ITEM,
     'title' => t('CMIS Query'),
     'page callback' => 'cmis_query_view',
     'access arguments' => array('access cmis'),
   );
-
   $items['admin/cmis/query'] = array(
     'type' => MENU_NORMAL_ITEM,
     'title' => t('CMIS Query'),
@@ -68,9 +66,8 @@ function cmis_query_view($query = NULL, $format = 'html', $p = 1) {
       if ($query_result) {
         // strip links property
         foreach ($query_result->objectList as $cmis_object) {
-          if (isset($cmis_object->links)) {
+          if (isset($cmis_object->links))
             unset($cmis_object->links);
-          }
           $result[] = $cmis_object;
         }
       }
@@ -80,9 +77,8 @@ function cmis_query_view($query = NULL, $format = 'html', $p = 1) {
 
     default:
       $contents = drupal_render((drupal_get_form('cmis_query_form', NULL)));
-      if ($query_result) {
+      if ($query_result)
         $contents .= theme('cmis_query_results', array('rows' => $query_result->objectList));
-      }
   }
 
   return $contents;
@@ -98,19 +94,16 @@ function cmis_query_form($form, &$form_state) {
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
-
   $cmis_query['cmis_query'] = array(
     '#type' => 'textarea',
     '#title' => t('Query'),
     '#size' => 50,
     '#default_value' => urldecode(arg(2)),
   );
-
   $cmis_query['cmis_query_submit'] = array(
     '#type' => 'submit',
     '#value' => t('Run'),
   );
-
   $form['statement'] = $cmis_query;
 
   return $form;
@@ -121,9 +114,8 @@ function cmis_query_form($form, &$form_state) {
  *
  */
 function cmis_query_form_submit($form, &$form_state) {
-  if ($form_state['values']['cmis_query']) {
+  if ($form_state['values']['cmis_query'])
     $form_state['redirect'] = 'cmis/query/' . urlencode(trim($form_state['values']['cmis_query']));
-  }
   else {
     $form_state['redirect'] = 'cmis/query';
     form_set_error('cmis_query_form', 'Please enter a query');
@@ -137,3 +129,5 @@ function cmis_query_form_submit($form, &$form_state) {
 function theme_cmis_query_results($variables) {
   return theme('cmis_browser_browse_children', array('context' => $variables['rows']));
 }
+
+?>
