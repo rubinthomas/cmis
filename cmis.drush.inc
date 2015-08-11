@@ -23,7 +23,7 @@ define('CMISPHPLIB_DOWNLOAD_URI', 'https://people.apache.org/~richardm/chemistry
  * @return
  *   An associative array describing your command(s).
  */
- 
+
 function cmis_drush_command() {
   $items = array();
   // the key in the $items array is the name of the command.
@@ -63,7 +63,7 @@ function cmis_drush_help($section) {
 /**
  * Command to download the PHP CMIS Library plugin.
  */
- 
+
 function drush_cmis_library() {
   if (!drush_shell_exec('type unzip')) {
     return drush_set_error(dt('Missing dependency: unzip. Install it before using this command.'));
@@ -114,3 +114,5 @@ function drush_cmis_library() {
     drush_log(dt('PHP CMIS Library plugin has been downloaded to @path', array('@path' => $path)), 'success');
   }
 }
+
+?>
