@@ -12,9 +12,7 @@ define('CMIS_SPACESTORE', 'workspace://SpacesStore/');
  */
 function cmis_taxonomy_lookup(&$node, $field_name = 'tags', $field_value = NULL) {
   $terms = NULL;
-  #print "<pre>node :".print_r($node,1)."</pre>";
-  #print "<pre>field_name :".print_r($field_name,1)."</pre>";
-  #print "<pre>field_value :".print_r($field_value,1)."</pre>";
+
   if(!empty($field_value)) {
     //Check Lookup Table
     if(is_array($field_value)) {
@@ -33,41 +31,38 @@ function cmis_taxonomy_lookup(&$node, $field_name = 'tags', $field_value = NULL)
       $cat_objId = str_replace(CMIS_SPACESTORE,'',$field_value);
       $terms = cmis_taxonomy_lookup_term($cat_objId);
     }
-    #print "<pre>terms : ".print_r($terms,1)."</pre>";
+
     if(is_array($terms) && !empty($terms)) {
       $vids = array_keys($terms);
       $tids = array_values($terms);
-      #print "<pre>vids : ".print_r($vids,1)."</pre>";
-      #print "<pre>tids : ".print_r($tids,1)."</pre>";
+
       if((strpos($field_name, 'tags')!== false) || (strpos($field_name, '1')!== false)) {
         foreach ($tids as $k => $tid) {
-          #print "<pre>tidterms : ".print_r($terms[$vids[$k]],1)."</pre>";
           if(is_array($terms[$vids[$k]]) && !empty($terms[$vids[$k]])) {
-            foreach($terms[$vids[$k]] as $key => $value) {
+            foreach($terms[$vids[$k]] as $key => $value)
               $node->{$field_name}[LANGUAGE_NONE][$key]['tid'] = $value;
-            }
           }
           else
             $node->{$field_name}[LANGUAGE_NONE][0]['tid'] = $terms[$vids[$k]];
         }
+        if(is_array($node->{$field_name}) && !empty($node->{$field_name})) {
+          $unsorted = $node->{$field_name}[LANGUAGE_NONE];
+          $sorted = array_unique($unsorted, SORT_REGULAR);
+          $node->{$field_name}[LANGUAGE_NONE] = $sorted;
+        }
       }
       else if(is_array($vids) && !empty($vids)) {
-        $str=NULL;
         foreach ($vids as $k => $vid) {
-            if (!empty($vids[$k])) {
-            $str = NULL;
-            $str = "".$vids[$k]."";//Convert to string
-            if (strpos($field_name, $str)!== false) {
-              #print "<pre>vidterms : ".print_r($terms[$vids[$k]],1)."</pre>";
-              if(is_array($terms[$vids[$k]]) && !empty($terms[$vids[$k]])) {
-                foreach($terms[$vids[$k]] as $key => $value) {
-                  $node->{$field_name}[LANGUAGE_NONE][$key]['tid'] = $value;
-                }
-              }
-              else
-                $node->{$field_name}[LANGUAGE_NONE][0]['tid'] = $terms[$vids[$k]];
+          $str = strval($vids[$k]);
+          if (!empty($str) && strpos($field_name, $str)!== false) {
+            if(is_array($terms[$str]) && !empty($terms[$str])) {
+              foreach($terms[$vids[$k]] as $key => $value)
+                $node->{$field_name}[LANGUAGE_NONE][$key]['tid'] = $value;
             }
+            else
+              $node->{$field_name}[LANGUAGE_NONE][0]['tid'] = $terms[$vids[$k]];
           }
+          $str = NULL;
         }
       }
       else
@@ -88,11 +83,9 @@ function cmis_taxonomy_lookup(&$node, $field_name = 'tags', $field_value = NULL)
 function cmis_taxonomy_lookup_term($cat_objId=NULL) {
   $term = NULL;
   if(!empty($cat_objId)) {
-    $cmis_taxonomy = db_query('SELECT * FROM {cmis_taxonomy} WHERE cmis_objectId = :cmis_objectId',
-      array(':cmis_objectId' => $cat_objId));
+    $cmis_taxonomy = db_query('SELECT * FROM {cmis_taxonomy} WHERE cmis_objectId = :cmis_objectId', array(':cmis_objectId' => $cat_objId));
     if ($cmis_taxonomy->rowCount()) {
       $cmis_taxonomy = $cmis_taxonomy->fetchObject();
-      #print "<pre>cmis_taxonomy :".print_r($cmis_taxonomy,1)."</pre>";
       if($cmis_taxonomy->tid > 0) {
         $term[$cmis_taxonomy->vid] = $cmis_taxonomy->tid;
         return $term;
@@ -108,3 +101,5 @@ function cmis_taxonomy_lookup_term($cat_objId=NULL) {
   else
     return NULL;
 }
+
+?>
