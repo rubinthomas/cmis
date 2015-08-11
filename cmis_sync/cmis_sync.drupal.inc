@@ -27,7 +27,7 @@ function _cmis_sync_drupal_cmis_update($node, $op) {
       }
     }
   }
-  #print "<pre>cmis_node:".print_r($cmis_node,1)."</pre>";
+
   if($cmis_node_type === TRUE) {
     module_load_include('api.inc', 'cmis');
     $cmis_object = _cmis_sync_drupal_cmis_prepare($node);
@@ -337,9 +337,7 @@ function _cmis_sync_drupal_node_field_value(&$node, $field_name, $text_format = 
 function _cmis_sync_drupal_node_field_set(&$node, $field_name, $field_value = NULL, $text_format = 'full_html') {
   if (isset($node) && is_object($node) && property_exists ( $node , 'type' )) {
     $fields = field_info_instances('node', $node->type);
-    #print "<pre>fields : ".print_r($fields,1)."</pre>";
-    #print "<pre>node : ".print_r($node,1)."</pre>";
-    #exit;
+
     if (array_key_exists($field_name, $fields)) {
       switch($fields[$field_name]['widget']['type']) {
         case 'image_image':
