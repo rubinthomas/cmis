@@ -19,11 +19,6 @@ function cmis_common_cmis_info() {
  *
  */
 function cmis_common_menu() {
-  $items = array();
-
-  // add a module block to the admin/config page
-  // from http://drupal.stackexchange.com/a/14482
-  // this is the parent item
   $items['admin/config/cmis'] = array(
     'title' => t('CMIS'),
     'description' => t('CMIS configuration'),
@@ -33,8 +28,6 @@ function cmis_common_menu() {
     'file' => 'system.admin.inc',
     'file path' => drupal_get_path('module', 'system'),
   );
-
-  // and now child items can go in here
   $items['admin/config/cmis/common'] = array(
     'title' => t('CMIS Check'),
     'description' => t('Check the CMIS library status'),
@@ -100,9 +93,8 @@ function cmis_common_cmisapi_invoke() {
   $cmis_repository = cmis_get_repository($repository_id);
 
   // pass repository info from cache
-  if ($cmis_method == 'getRepositoryInfo' && isset($cmis_repository->info)) {
+  if ($cmis_method == 'getRepositoryInfo' && isset($cmis_repository->info))
     return $cmis_repository->info;
-  }
 
   // cache service instance
   if (!isset($cmis_repository->service)) {
@@ -111,7 +103,9 @@ function cmis_common_cmisapi_invoke() {
     // CommonCMISService allows other modules to control the way CMISService class
     // calls the CMIS repositories via hook_cmis_invoke()
 
-    $cmis_repository->service = new CommonCMISService($cmis_repository->settings['url'], isset($cmis_repository->settings['user']), isset($cmis_repository->settings['password']));
+    $cmis_repository->service = new CommonCMISService($cmis_repository->settings['url'],
+                                                      isset($cmis_repository->settings['user']),
+                                                      isset($cmis_repository->settings['password']));
   }
 
   return call_user_func_array(array($cmis_repository->service, $cmis_method), $args);
@@ -135,26 +129,23 @@ function cmis_common_cmis_invoke($url, $properties, $settings, $dry_run = FALSE)
   if(array_key_exists('headerswing_headers',$settings) && !empty($settings['headerswing_headers']['HTTP_USER_AGENT']))
     curl_setopt($session, CURLOPT_USERAGENT, $settings['headerswing_headers']['HTTP_USER_AGENT']);
 
-  if (!empty($settings['user'])) {
+  if (!empty($settings['user']))
     curl_setopt($session, CURLOPT_USERPWD, $settings['user'] . ":" . $settings['password']);
-  }
 
   curl_setopt($session, CURLOPT_CUSTOMREQUEST, $properties['method']);
 
   if ($properties['headers']) {
     $headers = array();
-    foreach($properties['headers'] as $header_name => $header_value) {
+    foreach($properties['headers'] as $header_name => $header_value)
       $headers[] = $header_name .': '. $header_value;
-    }
     curl_setopt($session, CURLOPT_HTTPHEADER, $headers);
   }
-  if ($properties['data']) {
+  if ($properties['data'])
     curl_setopt($session, CURLOPT_POSTFIELDS, $properties['data']);
-  }
 
-  if ($properties['method'] == "POST") {
+  if ($properties['method'] == "POST")
     curl_setopt($session, CURLOPT_POST, true);
-  }
+
 
   $retval = new stdClass();
   $retval->url = $url;
@@ -163,10 +154,10 @@ function cmis_common_cmis_invoke($url, $properties, $settings, $dry_run = FALSE)
   $retval->content_type_sent = $properties['headers']['Content-Type'];
 
   if (!$dry_run) {
-  $retval->body = curl_exec($session);
+    $retval->body = curl_exec($session);
     $retval->code = curl_getinfo($session, CURLINFO_HTTP_CODE);
 
-  if (!in_array($retval->code, array(200,201,204))) {
+    if (!in_array($retval->code, array(200,201,204))) {
       throw new CMISException(t("HTTP call to [@url] returned [@code]. Response: @response", array(
         '@code' => $retval->code,
         '@response' => strip_tags($retval->body),
@@ -174,7 +165,7 @@ function cmis_common_cmis_invoke($url, $properties, $settings, $dry_run = FALSE)
       )));
     }
 
-  $retval->content_type = curl_getinfo($session, CURLINFO_CONTENT_TYPE);
+    $retval->content_type = curl_getinfo($session, CURLINFO_CONTENT_TYPE);
     $retval->content_length = curl_getinfo($session, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
     curl_close($session);
   }
@@ -188,3 +179,5 @@ function cmis_common_cmis_invoke($url, $properties, $settings, $dry_run = FALSE)
 
   return $retval;
 }
+
+?>
