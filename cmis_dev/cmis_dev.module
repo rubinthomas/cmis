@@ -21,19 +21,17 @@ function cmis_dev_menu() {
 function cmis_dev_info() {
   module_load_include('api.inc', 'cmis');
 
-  try {
+  try
     $repository = cmis_get_repository();
-  }
   catch (CMISException $e) {
     cmis_error_handler('cmis_dev', $e);
-    return '';
+    return NULL;
   }
 
 
   $rows = array();
-  foreach($repository->info->repositoryInfo as $property_name => $property) {
+  foreach($repository->info->repositoryInfo as $property_name => $property)
     $rows[] = array(t($property_name), $property);
-  }
 
   return theme('table', array('header' => array(t('Name'), t('Properties')), 'rows' => $rows));
 }
