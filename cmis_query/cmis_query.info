@@ -5,8 +5,8 @@ dependencies[] = cmis
 dependencies[] = cmis_browser
 core = "7.x"
 project = "cmis"
-; Information added by  packaging script on 2013-11-18
+; Information added by  packaging script on 2015-08-11
 version = "7.x-2.x-dev"
 core = "7.x"
 project = "cmis"
-datestamp = "1384794206"
+datestamp = "1439260971"
