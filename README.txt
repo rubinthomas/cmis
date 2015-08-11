@@ -11,8 +11,7 @@ Content Management Interoperability Services client api
   * cmis_sync.module - Allows synchronization between
                        Drupal nodes and CMIS objects.
   * cmis_headerswing.module - Demo module that demonstrates using hook_cmis_invoke()
-			      to access the CMIS repository via header-based authentication
-                              such as Basic Auth or NTLM.
+                              to access the CMIS repository via header-based authentication such as Basic Auth or NTLM.
   * cmis_dev.module - Demo module that displays current CMIS repository's properties. Useful for basic connection testing.
 
 
@@ -53,9 +52,18 @@ $conf['cmis_repositories'] = array(
   'default' => array(
     'user' => '<cmis_user_username>',
     'password' => '<cmis_user_password>',
-    'url' => 'http://path/to/cmis/interface'
+    'label' => 'Alfresco',
+    'url' => 'http://<cmis_server_url>:<port>/<cmis_repo>/api/-default-/public/cmis/versions/1.1/atom',
+    'maxItems' => 10000,
+    'renditionFilter' => 'cmis:thumbnail,alf:webpreview',
+    'transport' => 'cmis_headerswing',
+    'headerswing_headers' => array(
+      'HTTP_HOST' => 'FRONTEND_HOST',
+      'HTTP_USER_AGENT' => 'Drupal',
+    )
   )
 );
+
 
 
  Settings:
@@ -71,11 +79,11 @@ $conf['cmis_repositories'] = array(
       - default CMIS folder displayed by cmis_browser module
       - optional, defaults to `repositoryInfo['cmis:rootFolderId']`, used by cmis_browser
   * transport - Drupal's module that implements hook_cmis_invoke($url, $properties, $settings) hook, where :
-                      - $url - CMIS absolute REST url
-                      - $properties - request properties
-                      - $settings - CMIS repositories settings comming from $conf['cmis_repositories']
-              - optional, defaults to `cmis_common` used by cmis module
-	      - See cmis_headerswing section below for more information
+      - $url - CMIS absolute REST url
+      - $properties - request properties
+      - $settings - CMIS repositories settings comming from $conf['cmis_repositories']
+      - optional, defaults to `cmis_common` used by cmis module
+      - See cmis_headerswing section below for more information
 
 
  To browse the CMIS repository go to http://localhost/cmis/browser.
@@ -89,24 +97,82 @@ Drupal-CMIS synchronization
 ---------------------------
 
  Make sure that cmis_sync module is enabled and cmis_repositories config var is set.
+ Check your configuration settings in Drupal: http://<site>/admin/config/cmis/cmis_sync
  Add the following lines to your settings.php file:
 
+Drupal-CMIS Taxonomy synchronization
+------------------------------------
+$conf['cmis_taxonomy'] = array(
+  'taxonomy' => array (
+    'tags' => array ( // Tags.
+      'enabled' => TRUE,
+      'cmis_type' => 'cm:category',
+      'cmis_tagorcat' => 'tags',
+      'maxItems' => 10000,
+      'content_field' => 'body',
+      'cmis_repositoryId' => 'default',
+      'cmis_folderPath' => '',#'/cm:categoryRoot/cm:taggable',
+      'cmis_folderId' => 'workspace://SpacesStore/tag:tag-root',
+      //SELECT * FROM cm:category where in_folder ('workspace://SpacesStore/tag:tag-root')
+      'deletes' => FALSE, // Deletes [Warning this deletes content in Alfresco]
+      'cmis_taxonomy_cron' => FALSE,
+    ),
+    'category' => array ( // Category.
+      'enabled' => TRUE,
+      'cmis_type' => 'cm:category',
+      'cmis_tagorcat' => 'category',
+      'maxItems' => 10000,
+      'content_field' => 'body',
+      'cmis_repositoryId' => 'default',
+      'cmis_folderPath' => '',#'/cm:categoryRoot/cm:generalclassifiable',
+      'cmis_folderId' => 'workspace://SpacesStore/695e9e95-53ca-4783-a2b7-a3e926c4ea92',
+      //SELECT * FROM cm:category where in_tree('695e9e95-53ca-4783-a2b7-a3e926c4ea92')
+      'deletes' => FALSE, // Deletes [Warning this deletes content in Alfresco]
+      'cmis_taxonomy_cron' => FALSE,
+    ),
+  )
+);
+
+Drupal-CMIS synchronization
+---------------------------
 $conf['cmis_sync_map'] = array(
-  'page' => array(
+  'document' => array ( // Actual Working {alfresco_document} Drupal Content Type.
     'enabled' => TRUE,
-    'cmis_folderPath' => '/SomePath'
-  ),
+    'cmis_type' => 'cmis:document',
+    'maxItems' => 10000,
+    'renditionFilter' => 'cmis:thumbnail,alf:webpreview',
+    'content_field' => 'body',
+    'content_format' => 'full_html',
+    //'cmis_repositoryId' => '-default-',
+    //'cmis_folderPath' => '/Shared/',
+    'cmis_folderId' => 'workspace://SpacesStore/4b9e6d5d-337d-4390-85f8-c302f4b42bc9',
+    'deletes' => FALSE, // Sync Deletes [Warning this deletes content in Alfresco]
+    'subfolders' => TRUE, // Sync sub folders
+    'cmis_sync_cron' => TRUE, // Grab only new items via cron. If FALSE Module will Sync all items under given cmis_folderPath
+    'cmis_sync_cron_enabled' => TRUE, //if TRUE, CMIS to Drupal sync will be triggered by cron.
+    'cmis_to_drupal' => TRUE,
+    'drupal_to_cmis' => FALSE,
+    #Field Mapping Drupal to CMIS and Vice Versa
+    'fields' => array(
+      array('drupal'=>'title', 'cmis'=>'cm:title', 'cmis to drupal' => TRUE, 'drupal to cmis' => FALSE),
+      array('drupal'=>'field_alf_objid', 'cmis'=>'cmis:objectId', 'cmis to drupal' => TRUE, 'drupal to cmis' => FALSE),
+      array('drupal'=>'field_alf_filename', 'cmis'=>'cmis:name', 'cmis to drupal' => TRUE, 'drupal to cmis' => FALSE),
+      array('drupal'=>'field_alf_version', 'cmis'=>'cmis:versionLabel', 'cmis to drupal' => TRUE, 'drupal to cmis' => FALSE),
+      array('drupal'=>'field_alf_description', 'cmis'=>'cmis:description', 'cmis to drupal' => TRUE, 'drupal to cmis' => FALSE),
+      array('drupal'=>'field_alf_last_mod_date', 'cmis'=>'cmis:lastModificationDate', 'cmis to drupal' => TRUE, 'drupal to cmis' => FALSE),
+      array('drupal'=>'field_alf_last_mod_by', 'cmis'=>'cmis:lastModifiedBy', 'cmis to drupal' => TRUE, 'drupal to cmis' => FALSE),
+      array('drupal'=>'field_alf_mime', 'cmis'=>'cmis:contentStreamMimeType', 'cmis to drupal' => TRUE, 'drupal to cmis' => FALSE),
+      array('drupal'=>'field_alf_versionseriesid', 'cmis'=>'cmis:versionSeriesId', 'cmis to drupal' => TRUE, 'drupal to cmis' => FALSE),
+      array('drupal'=>'field_alf_path', 'cmis'=>'cmis:versionSeriesId', 'cmis to drupal' => TRUE, 'drupal to cmis' => FALSE),
+      array('drupal'=>'field_alf_created_by', 'cmis'=>'cmis:createdBy', 'cmis to drupal' => TRUE, 'drupal to cmis' => FALSE),
+      array('drupal'=>'field_alf_filesize', 'cmis'=>'cmis:contentStreamLength', 'cmis to drupal' => TRUE, 'drupal to cmis' => FALSE),
+      array('drupal'=>'field_alf_renditions', 'cmis'=>'cmis:linkimage', 'cmis to drupal' => TRUE, 'drupal to cmis' => FALSE, 'text_format'=>'full_html'),
 
- 'custom_drupal_content_type' => array(
-    'enabled' => TRUE,
-    'cmis_folderPath' => '/SomeOtherPath'
-		'fields' => array(
-			'title' => 'cmis:name',
-			array('drupal'=>'some_other_custom_field', 'cmis'=>'cmis:someOtherCustomProperty', 'cmis to drupal' => TRUE, 'drupal to cmis' => FALSE)
-		)
+      #Vocabulary Section
+      array('drupal'=>'field_tags', 'cmis'=>'cm:taggable', 'cmis to drupal' => TRUE, 'drupal to cmis' => FALSE),
+      array('drupal'=>'field_alf_cat_2', 'cmis'=>'cm:categories', 'cmis to drupal' => TRUE, 'drupal to cmis' => FALSE),
+    ),
   ),
-
- 	// ...
 );
 
  This will enable the synchronization process which will sync drupal nodes
@@ -149,26 +215,6 @@ $conf['cmis_sync_map'] = array(
                               - useful if sync process is triggered by another event.
                               - optional, default: 'TRUE'
 
- Fields sync setting syntax:
-  * short hand syntax:
-
-$conf['cmis_sync_map']['page']['fields'] = array(
-  'title' => 'cmis:name',
-  'custom_cck_field' => 'some cmis custom property'
-)
-
-  * long hand syntax
-
-$conf['cmis_sync_map']['page']['fields'] = array(
-  array('drupal' => 'title', 'cmis' => 'cmis:name', 'drupal to cmis' => TRUE, 'cmis to drupal' => TRUE),
-  array('drupal' => 'custom_cck_field', 'cmis' => 'some cmis custom property', 'drupal to cmis' => TRUE, 'cmis to drupal' => TRUE),
-
-  // copy cmis:objectId to custom_cck_field2 drupal field.
-  // 'drupal to cmis' => FALSE, 'cmis to drupal' => TRUE means that only custom_cck_field2 Drupal field is updated.
-  // sync process will not try to update cmis:objectId from custom_cck_field2 field's value.
-  array('drupal' => 'custom_cck_field2', 'cmis' => 'cmis:objectId', 'drupal to cmis' => FALSE, 'cmis to drupal' => TRUE)
-)
-
 
 CMIS Hooks
 ----------
@@ -185,7 +231,6 @@ CMIS Hooks
   - cmis.api.inc
   - cmis_custom.module (hook_cmisapi_invoke)
   - cmis_headerswing.module (hook_cmis_invoke)
-
 
 CMIS Sync Hooks
 ---------------
