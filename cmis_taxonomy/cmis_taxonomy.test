@@ -31,9 +31,6 @@ class cmis_taxonomyTest extends DrupalWebTestCase {
     module_load_include('api.inc', 'cmis');
     module_load_include('cmis.inc', 'cmis_taxonomy');
     $ret = "<div class=\"messages status\">\n";
-    /*
-    * Test Code for functions written
-    */
     $context = array();
     $error = FALSE;
     $term_ctr = 0;
@@ -44,8 +41,8 @@ class cmis_taxonomyTest extends DrupalWebTestCase {
     $taxonomy_setting = $taxonomy + array(
       'cmis_tagorcat'  => $taxonomy_type,
       'content_format' => filter_default_format(),
-      'cmis_taxonomy_cron' => FALSE,);
-
+      'cmis_taxonomy_cron' => FALSE,
+    );
 
     $context['results'][$taxonomy_type]['new_term_tids'] = array();
     $context['results'][$taxonomy_type]['new_term_count'] = 0;
