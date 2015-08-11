@@ -3,8 +3,8 @@ description = CMIS implementation for interacting with a CMIS compliant reposito
 package = CMIS
 core = "7.x"
 project = "cmis"
-; Information added by  packaging script on 2015-01-03
+; Information added by  packaging script on 2015-08-11
 version = "7.x-2.x-dev"
 core = "7.x"
 project = "cmis"
-datestamp = "1420600718"
+datestamp = "1439260971"
