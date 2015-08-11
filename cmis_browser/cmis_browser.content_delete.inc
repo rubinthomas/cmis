@@ -50,3 +50,5 @@ function cmis_browser_content_delete_confirm_submit($form, &$form_state) {
 
   $form_state['redirect'] = $form_state['values']['return_url'];
 }
+
+?>

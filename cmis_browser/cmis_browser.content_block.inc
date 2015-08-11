@@ -59,3 +59,5 @@ function cmis_browser_block_settings_more_items_js() {
 
   drupal_json(array('status' => TRUE, 'data' => $output));
 }
+
+?>

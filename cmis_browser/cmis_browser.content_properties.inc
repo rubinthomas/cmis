@@ -26,3 +26,5 @@ function cmis_browser_content_properties() {
     return '';
   }
 }
+
+?>

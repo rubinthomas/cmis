@@ -77,3 +77,5 @@ function _cmis_browser_content_get_folder($repository, $object) {
     'type' => !empty($_GET['type']) ? check_plain($_GET['type']) : '',
   ));
 }
+
+?>

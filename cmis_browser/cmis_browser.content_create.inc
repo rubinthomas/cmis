@@ -67,3 +67,5 @@ function _cmis_browser_actions_content_create($folder_path, $document_name, $doc
     return FALSE;
   }
 }
+
+?>

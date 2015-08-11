@@ -81,3 +81,5 @@ function cmis_browser_tree() {
 
   drupal_json_output($result);
 }
+
+?>
