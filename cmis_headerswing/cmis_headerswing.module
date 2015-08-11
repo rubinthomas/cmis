@@ -6,10 +6,12 @@
  * $conf example:
  * $conf['cmis_repositories'] = array(
  *   'default' => array(
- *     'user' => 'admin',
- *     'password' => 'admin',
- *     'label' => 'local cmis repo',
- *     'url' => 'http://127.0.0.1:8080/cmis',
+ *     'user' => '<cmis_user_username>',
+ *     'password' => '<cmis_user_password>',
+ *     'label' => 'CMIS repo',
+ *     'url' => 'http://<cmis_server_url>:<port>/<cmis_repo>/api/-default-/public/cmis/versions/1.1/atom',
+ *     'maxItems' => 10000,
+ *     'renditionFilter' => 'cmis:thumbnail,alf:webpreview',
  *     'transport' => 'cmis_headerswing',
  *     'headerswing_headers' => array(
  *       'HTTP_HOST' => 'FRONTENT_HOST',
@@ -25,15 +27,16 @@
  */
 function cmis_headerswing_cmis_invoke($url, $properties, $settings) {
   if (array_key_exists('headerswing_headers', $settings)) {
-    if (!array_key_exists('headers', $properties)) {
+    if (!array_key_exists('headers', $properties))
       $properties['headers'] = array();
-    }
 
     foreach($settings['headerswing_headers'] as $header_src => $header_dest) {
-      if(array_key_exists($header_src, $_SERVER)) {
+      if(array_key_exists($header_src, $_SERVER))
         $properties['headers'][$header_dest] = $_SERVER[$header_src];
-      }
     }
   }
+
   return cmis_common_cmis_invoke($url, $properties, $settings);
 }
+
+?>
