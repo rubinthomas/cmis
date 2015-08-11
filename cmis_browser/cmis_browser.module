@@ -5,7 +5,6 @@
  *
  */
 function cmis_browser_menu() {
-  $items = array();
   $items['cmis/browser'] = array(
     'type' => MENU_NORMAL_ITEM,
     'title' => t('CMIS Repository'),
@@ -14,7 +13,6 @@ function cmis_browser_menu() {
     'access arguments' => array('access cmis'),
     'file' => 'cmis_browser.content_get.inc'
   );
-
   $items['admin/cmis/browser'] = array(
     'type' => MENU_NORMAL_ITEM,
     'title' => t('CMIS Browser'),
@@ -23,7 +21,6 @@ function cmis_browser_menu() {
     'access arguments' => array('access cmis'),
     'file' => 'cmis_browser.content_get.inc'
   );
-
   $items['cmis/delete'] = array(
     'type' => MENU_CALLBACK,
     'page callback' => 'drupal_get_form',
@@ -32,7 +29,6 @@ function cmis_browser_menu() {
     'access arguments' => array('delete cmis'),
     'file' => 'cmis_browser.content_delete.inc'
   );
-
   $items['cmis/properties'] = array(
     'type' => MENU_CALLBACK,
     'page callback' => 'cmis_browser_content_properties',
@@ -40,7 +36,6 @@ function cmis_browser_menu() {
     'access arguments' => array('access cmis'),
     'file' => 'cmis_browser.content_properties.inc'
   );
-
   $items['cmis/autocomplete'] = array(
     'title' => t('cmis path autocomplete'),
     'page callback' => 'cmis_browser_autocomplete',
@@ -49,7 +44,6 @@ function cmis_browser_menu() {
     'type' => MENU_CALLBACK,
     'file' => 'cmis_browser.content_autocomplete.inc'
   );
-
   $items['cmis/tree'] = array(
     'title' => t('cmis tree nav'),
     'page callback' => 'cmis_browser_tree',
@@ -58,7 +52,6 @@ function cmis_browser_menu() {
     'type' => MENU_CALLBACK,
     'file' => 'cmis_browser.content_autocomplete.inc'
   );
-
   $items['admin/config/cmis/browser'] = array(
     'title' => t('Set Root location for CMIS Broswer'),
     'page callback' => 'drupal_get_form',
@@ -72,14 +65,13 @@ function cmis_browser_menu() {
 }
 
 function cmis_browser_admin_settings(){
-
-  $form = array();
   $form['cmis_browser_root'] = array(
     '#title' => t('Root Directory'),
     '#description' => t('Root folder for CMIS nodes'),
     '#type' => 'textfield',
     '#default_value' => variable_get('cmis_browser_root'),
   );
+
   return system_settings_form($form);
 }
 
@@ -90,6 +82,7 @@ function cmis_browser_admin_paths() {
   $paths = array(
     'cmis/properties' => TRUE,
   );
+
   return $paths;
 }
 
@@ -141,26 +134,6 @@ function cmis_browser_theme() {
 function cmis_browser_browse_form($form, &$form_state) {
   $parts = explode('/', $_GET['q']);
   $path = implode('/', array_slice($parts, 2));
-
-  //TODO: Removing autocomplete as a buggy (and not-so-useful) feature. Need to replace with search.
-  /*
-  $form['path'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Path'),
-    '#default_value' => '/'.  $path,
-    '#autocomplete_path' => 'cmis/autocomplete',
-    '#size' => 50,
-    //'#theme' => 'cmis_browser_folder_picker',
-    );
-
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#name' => 'browse',
-    '#default_value' => 'Browse',
-  );
-
-  return $form;
-  */
 }
 
 /**
@@ -262,12 +235,12 @@ function cmis_browser_actions_form_submit($form, & $form_state) {
     case 'content_upload_action':
       // @todo cleanup uploaded file
       $file = file_save_upload('file');
-      if ($file) {
+      if ($file)
         _cmis_browser_actions_content_create($path, $file->filename, file_get_contents(drupal_realpath($file->uri)), $file->filemime);
-      }
-      else {
+      else
         form_set_error('content_upload', t('Unable to handle uploaded file.'));
-      }
       break;
   }
 }
+
+?>
