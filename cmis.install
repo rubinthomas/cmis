@@ -14,3 +14,4 @@ function cmis_uninstall() {
     ->execute();
   cache_clear_all('variables', 'cache_bootstrap');
 }
+?>
