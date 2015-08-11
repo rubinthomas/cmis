@@ -1,13 +1,13 @@
 <?php
+
 libraries_load('cmis-phplib');
 class CommonCMISService extends CMISService {
   function doRequest($url, $method='GET', $content = NULL, $contentType = NULL, $charset = NULL) {
-    if (!empty($this->workspace) && !empty($this->workspace->repositoryInfo->repositoryId)) {
+    if (!empty($this->workspace) && !empty($this->workspace->repositoryInfo->repositoryId))
       $repoId = $this->workspace->repositoryInfo->repositoryId;
-    }
-    else {
+    else
       $repoId = 'default';
-    }
+
     $result = cmis_invoke($repoId, $url, array(
       'method' => $method,
       'data' => $content,
@@ -29,3 +29,5 @@ class CommonCMISService extends CMISService {
     return $retval;
   }
 }
+
+?>
