@@ -35,3 +35,5 @@ function cmis_dev_info() {
 
   return theme('table', array('header' => array(t('Name'), t('Properties')), 'rows' => $rows));
 }
+
+?>
