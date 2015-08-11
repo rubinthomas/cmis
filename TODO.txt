@@ -1,3 +1,16 @@
-/* TODO - Configuration options */
+/* TODO */
+Update CMIS Taxonomy to provide manual edit to Vocabulary/Term Mapping in the Admin
+Update README.txt
 
-cmis_sync.drupal.inc - line 268 - Setting format of fields should be done at the field mapping level, not hard coded.
+.editconfig File for Code [http://editorconfig.org/]
+----------------------------------------------------
+root = true
+
+[*]
+
+end_of_line = lf
+insert_final_newline = false
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+charset = utf-8
