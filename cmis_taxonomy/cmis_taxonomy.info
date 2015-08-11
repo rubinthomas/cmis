@@ -3,6 +3,7 @@ description = Provides Category/Tags with other CMIS repositories without hierar
 package = CMIS
 dependencies[] = cmis
 core = "7.x"
+configure = admin/config/cmis/cmis_taxonomy
 ; Information added by  packaging script on 2015-08-11
 version = "7.x-2.x-dev"
 core = "7.x"
