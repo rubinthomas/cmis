@@ -40,9 +40,8 @@ function cmis_browser_content_get() {
 function _cmis_browser_content_get_document($repository, $object) {
   module_load_include('api.inc', 'cmis');
 
-  try {
+  try
     $content = cmisapi_getContentStream($repository->repositoryId, $object->id);
-  }
   catch (CMISException $e) {
     cmis_error_handler('cmis_browser_content_get', $e);
     drupal_add_http_header('', 'HTTP/1.1 503 Service unavailable');
@@ -55,13 +54,8 @@ function _cmis_browser_content_get_document($repository, $object) {
 
   drupal_add_http_header('Cache-Control', 'no-cache, must-revalidate');
   drupal_add_http_header('Content-type', $object->properties['cmis:contentStreamMimeType']);
-  if ($object->properties['cmis:contentStreamMimeType'] != 'text/html') {
-    drupal_add_http_header('Content-Disposition', 'attachment; filename="'. $object->properties['cmis:name'] .'"');
-  }
-
-
+  drupal_add_http_header('Content-Disposition', 'attachment; filename="'. $object->properties['cmis:name'] .'"');
   print($content);
-
   exit();
 }
 
@@ -70,9 +64,8 @@ function _cmis_browser_content_get_document($repository, $object) {
  *
  */
 function _cmis_browser_content_get_folder($repository, $object) {
-  try {
+  try
     $children = cmisapi_getChildren($repository->repositoryId, $object->id)->objectList;
-  }
   catch (CMISException $e) {
     cmis_error_handler('cmis_browser', $e);
     return '';
