@@ -13,3 +13,5 @@ function cmis_browser_uninstall() {
   variable_del('cmis_browser_root');
   return;
 }
+
+?>
