@@ -27,18 +27,20 @@ function cmis_taxonomy_vocabulary(){
 
   $query->fields('p', array('cmis_vid', 'vid', 'cmis_vname', 'cmis_repositoryId', 'cmis_objectId', 'cmis_exclude','timestamp'))
     ->orderByHeader($header)
-        ->orderBy('timestamp', 'DESC')
-        ->limit(10);
+    ->orderBy('timestamp', 'DESC')
+    ->limit(100);
   $results = $query->execute();
-
-  $rows = array();
-  foreach ($results as $row) {
-    $rows[] = array("<a href=\"/admin/cmis/cmis_taxonomy/vocabulary/edit/".$row->cmis_vid."\">".$row->cmis_vname."</a>",
-          $row->cmis_repositoryId,
-                    $row->cmis_objectId,
-                    $row->cmis_exclude,
-          date("j F Y", $row->timestamp)
-    );
+  if(!empty($results)) {
+    $rows = array();
+    foreach ($results as $row) {
+      $rows[] = array(
+        "<a href=\"/admin/cmis/cmis_taxonomy/vocabulary/edit/".$row->cmis_vid."\">".$row->cmis_vname."</a>",
+        $row->cmis_repositoryId,
+        $row->cmis_objectId,
+        $row->cmis_exclude,
+        date("j F Y", $row->timestamp)
+      );
+    }
   }
   $output = theme('table', array('header' => $header, 'rows' => $rows ));
   $output .= theme('pager');
@@ -56,9 +58,8 @@ function cmis_taxonomy_vocabulary_admin_form($form, &$form_state) {
  * Form validation
  */
 function cmis_taxonomy_vocabulary_admin_form_validate($form, &$form_state){
-    if ($form_state['values']['vocabulary'] == 'no'){
-        form_set_error('vocabulary', '"<b>no</b>" is not a valid answer, try again.');
-    }
+  if ($form_state['values']['vocabulary'] == 'no')
+    form_set_error('vocabulary', '"<b>no</b>" is not a valid answer, try again.');
 }
 
 /**
@@ -76,9 +77,9 @@ function cmis_taxonomy_vocabulary_admin_form_submit(&$form, &$form_state){
  */
 function cmis_taxonomy_admin_settings() {
   $page = array(
-      'title' => t('Settings.php \'cmis_taxonomy\' Configuration Value Check'),
-      'description' => t('Global CMIS Taxonomy \'cmis_taxonomy\' Configuration check'),
-    );
+    'title' => t('Settings.php \'cmis_taxonomy\' Configuration Value Check'),
+    'description' => t('Global CMIS Taxonomy \'cmis_taxonomy\' Configuration check'),
+  );
   return cmis_taxonomy_setting_validate();
 }
 
@@ -107,6 +108,8 @@ function cmis_taxonomy_setting_validate() {
   }
   else
     drupal_set_message(t('Missing Global Configuration [\'cmis_taxonomy\']Array in settings.php'), 'error',FALSE);
+
   return $ret."</div>\n";
 }
+
 ?>
