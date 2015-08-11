@@ -2,54 +2,40 @@
 
 /**
  * Returns a CMIS repository properties, based on local configuration.
+ * Check your configuration settings in Drupal: http://<site>/admin/config/cmis/cmis_sync
  *
  * Config sample:
- *  $conf['cmis_repositories'] = array(
- *    'default' => array(
- *      'user' => 'cmisuser',
- *      'password' => '******',
- *      'label' => 'Alfresco 5.0a',
- *      'url' => 'http://www.trunet.local:8080/alfresco/api/-default-/public/cmis/versions/1.1/atom',
- *      'maxItems' => 10000,
- *      'renditionFilter' => 'cmis:thumbnail,alf:webpreview',
- *      'transport' => 'cmis_headerswing',
- *      'headerswing_headers' => array (
- *        'HTTP_HOST' => 'http://www.trunet.local/',
- *        'HTTP_USER_AGENT' => 'Drupal 7.34',
- *      )
- *    )
- *  );
+ * $conf['cmis_repositories'] = array(
+ * 'default' => array(
+ *  'user' => '<cmis_user_username>',
+ *  'password' => '<cmis_user_password>',
+ *  'label' => 'Alfresco',
+ *  'url' => 'http://<cmis_server_url>:<port>/<cmis_repo>/api/-default-/public/cmis/versions/1.1/atom',
+ *  'maxItems' => 10000,
+ *  'renditionFilter' => 'cmis:thumbnail,alf:webpreview',
+ *  'transport' => 'cmis_headerswing',
+ *  'headerswing_headers' => array(
+ *    'HTTP_HOST' => 'FRONTEND_HOST',
+ *    'HTTP_USER_AGENT' => 'Drupal',
+ *    'PHP_AUTH_USER' => 'FRONTEND_USER'
+ *    'PHP_AUTH_DIGEST' => 'FRONTEND_AUTH'
+ *  )
  *
- *  $conf['cmis_repositories'] = array(
- *    'default' => array (
- *      'label' => 'Local',
- *      'url' => 'http://127.0.0.1:8080/alfresco/cmisatom',
- *      'transport' => 'cmis_headerswing',
- *      'headerswing_headers' => array (
- *        // headers copied from $_SERVER[] to CMIS repository curl call
- *        'HTTP_HOST' => 'FRONTENT_HOST',
- *        'HTTP_HOST' => 'FRONTENT_HOST_AGAIN',
- *        'HTTP_USER' => 'FRONTENT_USER',
- *        'PHP_AUTH_USER' => 'FRONTENT_USER'
- *        'PHP_AUTH_DIGEST' => 'FRONTEND_AUTH'
- *      )
- *    ),
+ *  'demo cmis alfresco' => array(
+ *    'label' => 'cmis.alfresco.com',
+ *    'user' => 'admin',
+ *    'password' => 'admin',
+ *    'url' => 'http://cmis.alfresco.com/cmisatom'
+ *  ),
  *
- *    'demo cmis alfresco' => array(
- *      'label' => 'cmis.alfresco.com',
- *      'user' => 'admin',
- *      'password' => 'admin',
- *      'url' => 'http://cmis.alfresco.com/cmisatom'
- *    ),
- *
- *    'demo cmis nuxeo' => array(
- *      'label' => 'cmis.demo.nuxeo.org',
- *      'user' => 'Administrator',
- *      'password' => 'Administrator',
- *      'url' => 'http://cmis.demo.nuxeo.org/nuxeo/site/cmis',
- *      'repository_id' => '8006e8e1-2298-4764-998c-5800383ac88a'
- *    )
- *  );
+ *  'demo cmis nuxeo' => array(
+ *    'label' => 'cmis.demo.nuxeo.org',
+ *    'user' => 'Administrator',
+ *    'password' => 'Administrator',
+ *    'url' => 'http://cmis.demo.nuxeo.org/nuxeo/site/cmis',
+ *    'repository_id' => '8006e8e1-2298-4764-998c-5800383ac88a'
+ *  )
+ * );
  *
  * Usage:
  *   // get default CMIS repository info
@@ -113,7 +99,8 @@ function cmis_get_repository($id_or_alias = NULL) {
       $repositories_cache[$cmis_repository->repositoryId] = & $repositories_cache[$id_or_alias];
     }
     else {
-      throw new CMISException(t('Unable to lookup CMIS repository [@cmis_id_or_alias]', array('@cmis_id_or_alias' => $id_or_alias)));
+      throw new CMISException(t('Unable to lookup CMIS repository [@cmis_id_or_alias]',
+                                array('@cmis_id_or_alias' => $id_or_alias)));
     }
   }
 
@@ -150,8 +137,8 @@ function cmis_invoke($repositry_id, $url = '', $properties = array()) {
     foreach (module_implements('cmis_invoke') as $module) {
       //Determine which module to use and change the cmis_transport mechanism from the default set in cmis_get_repository
       if($module != $cmis_transport){
-       $cmis_transport = $module;
-       break;
+      $cmis_transport = $module;
+      break;
       }
     }
   }
@@ -161,7 +148,9 @@ function cmis_invoke($repositry_id, $url = '', $properties = array()) {
     return module_invoke($cmis_transport, 'cmis_invoke', $url, $properties, $cmis_repository->settings);
   }
   else {
-    throw new CMISException(t('Unable to lookup CMIS transport [@cmis_transport] for [@cmis_id_or_alias]', array('@cmis_id_or_alias' => $repositry_id, '@cmis_transport' => $cmis_transport)));
+    throw new CMISException(t('Unable to lookup CMIS transport [@cmis_transport] for [@cmis_id_or_alias]',
+                              array('@cmis_id_or_alias' => $repositry_id,
+                                    '@cmis_transport' => $cmis_transport)));
   }
 }
 
@@ -231,15 +220,14 @@ function cmis_menu() {
     'title'            => t('CMIS'),
     'description'      => t('CMIS Module'),
     'page callback'    => 'cmis_landing',
-    'type'             => MENU_NORMAL_ITEM,
-    'access arguments' => array('access cmis'),
+  'type'             => MENU_NORMAL_ITEM,
+  'access arguments' => array('access cmis'),
   );
   return $items;
 }
 
 /**
- * CMIS Landing page
- * Useful to see all links available based on sub modules enabled
+ * CMIS
  *
  * @return $ret
  */
@@ -249,23 +237,23 @@ function cmis_landing() {
   $ret .= l('Check PHP CMIS library', 'admin/config/cmis/common') . '<br />'."\n";
   if(module_exists('cmis_browser')) {
     $ret .= "<p>".l('Check CMIS Browser Settings', 'admin/config/cmis/browser').'</p>'."\n";
-    $ret .= "<p>".l('CMIS Browser', 'cmis/browser').'</p>'."\n";
+  $ret .= "<p>".l('CMIS Browser', 'cmis/browser').'</p>'."\n";
   }
   if(module_exists('cmis_query')) {
-    $ret .= "<p>".l('CMIS SQL Query', 'cmis/query').'</p>'."\n";
+  $ret .= "<p>".l('CMIS SQL Query', 'cmis/query').'</p>'."\n";
   }
   if(module_exists('cmis_sync')) {
-    $ret .= "<p>Please Check Your Global Configuration Settings.PHP file before Importing Data from CMIS Repository</p>"."\n";
+  $ret .= "<p>Please Check Your Global Configuration Settings.PHP file before Importing Data from CMIS Repository</p>"."\n";
     $ret .= "<p>If you need help on configuration, have a look at the ".l('Help Section', 'admin/help/cmis_sync') . '</p>'."\n";
     $ret .= "<p>".l('Check CMIS Sync Settings', 'admin/config/cmis/cmis_sync').'</p>'."\n";
-    $ret .= "<p>".'Import CMIS data from CMIS Repository into Drupal Content Type is done in Cron. Please check permissions before running Cron</p>'."\n";
+  $ret .= "<p>".'Import CMIS data from CMIS Repository into Drupal Content Type is done in Cron. Please check permissions before running Cron</p>'."\n";
   }
   if(module_exists('cmis_taxonomy')) {
-    $ret .= "<p>Please Check Your Global Configuration Settings.PHP file before Importing Data from CMIS Repository</p>"."\n";
+  $ret .= "<p>Please Check Your Global Configuration Settings.PHP file before Importing Data from CMIS Repository</p>"."\n";
     $ret .= "<p>If you need help on configuration, have a look at the ".l('Help Section', 'admin/help/cmis_taxonomy') . '</p>'."\n";
     $ret .= "<p>".l('Check CMIS Taxonomy Settings', 'admin/config/cmis/cmis_taxonomy').'</p>'."\n";
-    $ret .= "<p>".l('CMIS Vocabulary Mapping', 'admin/cmis/cmis_taxonomy/vocabulary').'</p>'."\n";
-    $ret .= "<p>".l('Import CMIS Tags/Category data from CMIS Repository into Drupal Taxonomy', 'admin/cmis_taxonomy/cmis_taxonomy_import').'</p>'."\n";
+  $ret .= "<p>".l('CMIS Vocabulary Mapping', 'admin/cmis/cmis_taxonomy/vocabulary').'</p>'."\n";
+  $ret .= "<p>".l('Import CMIS Tags/Category data from CMIS Repository into Drupal Taxonomy', 'admin/cmis_taxonomy/cmis_taxonomy_import').'</p>'."\n";
   }
   return $ret;
 }
@@ -364,3 +352,5 @@ function cmis_repository_switcher_form_submit($form, & $form_state) {
   // redirect to the source page
   $form_state['redirect'] = $_GET['q'];
 }
+
+?>
