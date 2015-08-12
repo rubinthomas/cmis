@@ -6,7 +6,7 @@
 /**
  * The CMIS plugin URI.
  */
-define('CMISPHPLIB_DOWNLOAD_URI', 'https://people.apache.org/~richardm/chemistry/phpclient/0.2.0-RC1/cmis-phplib.zip');
+define('CMISPHPLIB_DOWNLOAD_URI', 'https://github.com/rubinthomas/cmis-phplib/archive/master.zip');
 
 /**
  * Implementation of hook_drush_command().
