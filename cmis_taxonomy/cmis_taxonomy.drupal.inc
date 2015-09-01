@@ -45,11 +45,13 @@ function cmis_taxonomy_lookup(&$node, $field_name = 'tags', $field_value = NULL)
           else
             $node->{$field_name}[LANGUAGE_NONE][0]['tid'] = $terms[$vids[$k]];
         }
-        if(is_array($node->{$field_name}) && !empty($node->{$field_name})) {
+        if(property_exists($node, $field_name) && is_array($node->{$field_name}) && !empty($node->{$field_name})) {
           $unsorted = $node->{$field_name}[LANGUAGE_NONE];
           $sorted = array_unique($unsorted, SORT_REGULAR);
           $node->{$field_name}[LANGUAGE_NONE] = $sorted;
         }
+        else
+          watchdog('cmis_taxonomy', 'No @field_name for @node exists ', array('@field_name' => print_r($field_name,1), '@node' => print_r($node,1)), WATCHDOG_ERROR, NULL);
       }
       else if(is_array($vids) && !empty($vids)) {
         foreach ($vids as $k => $vid) {
@@ -64,6 +66,13 @@ function cmis_taxonomy_lookup(&$node, $field_name = 'tags', $field_value = NULL)
           }
           $str = NULL;
         }
+        if(property_exists($node, $field_name) && is_array($node->{$field_name}) && !empty($node->{$field_name})) {
+          $unsorted = $node->{$field_name}[LANGUAGE_NONE];
+          $sorted = array_unique($unsorted, SORT_REGULAR);
+          $node->{$field_name}[LANGUAGE_NONE] = $sorted;
+        }
+        else
+          watchdog('cmis_taxonomy', 'No @field_name for @node exists ', array('@field_name' => print_r($field_name,1), '@node' => print_r($node,1)), WATCHDOG_ERROR, NULL);
       }
       else
         unset($node->{$field_name});
