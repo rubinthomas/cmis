@@ -55,7 +55,7 @@ function cmis_taxonomy_lookup(&$node, $field_name = 'tags', $field_value = NULL)
             watchdog('cmis_taxonomy', 'No @field_name fhas no data', array('@field_name' => print_r($field_name,1)), WATCHDOG_INFO, NULL);
         }
         else
-          watchdog('cmis_taxonomy', 'No @field_name for @node exists ', array('@field_name' => print_r($field_name,1), '@node' => print_r($node,1)), WATCHDOG_ERROR, NULL);
+          watchdog('cmis_taxonomy', 'No @field_name for @node', array('@field_name' => print_r($field_name,1), '@node' => print_r($node,1)), WATCHDOG_ERROR, NULL);
       }
       else if(is_array($vids) && !empty($vids)) {
         foreach ($vids as $k => $vid) {
@@ -80,7 +80,7 @@ function cmis_taxonomy_lookup(&$node, $field_name = 'tags', $field_value = NULL)
             watchdog('cmis_taxonomy', 'No @field_name fhas no data', array('@field_name' => print_r($field_name,1)), WATCHDOG_INFO, NULL);
         }
         else
-          watchdog('cmis_taxonomy', 'No @field_name for @node exists ', array('@field_name' => print_r($field_name,1), '@node' => print_r($node,1)), WATCHDOG_ERROR, NULL);
+          watchdog('cmis_taxonomy', 'No @field_name for @node', array('@field_name' => print_r($field_name,1), '@node' => print_r($node,1)), WATCHDOG_ERROR, NULL);
       }
       else
         unset($node->{$field_name});
