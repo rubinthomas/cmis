@@ -20,7 +20,7 @@ function cmis_taxonomy_vocabulary(){
     array('data' => 'Vocabulary', 'field' => 'cmis_vname', 'sort' => 'ASC'),
     array('data' => 'CMIS Repository', 'field' => 'cmis_repositoryId', 'sort' => 'ASC'),
     array('data' => 'CMIS Cat ObjectID', 'field' => 'cmis_objectId', 'sort' => 'ASC'),
-    array('data' => 'Excluded', 'field' => 'cmis_exclude', 'sort' => 'ASC'),
+    array('data' => 'CMIS Synced', 'field' => 'cmis_exclude', 'sort' => 'ASC'),
     array('data' => 'Timestamp', 'field' => 'timestamp', 'sort' => 'ASC'),
   );
   $query = db_select('cmis_vocab', 'p')->extend('PagerDefault')->extend('TableSort');
@@ -32,13 +32,13 @@ function cmis_taxonomy_vocabulary(){
   $results = $query->execute();
   if(!empty($results)) {
     $rows = array();
+    $options = array(0 => 'Included', 1 => 'Excluded');
     foreach ($results as $row) {
-      $rows[] = array(
-        "<a href=\"/admin/cmis/cmis_taxonomy/vocabulary/edit/".$row->cmis_vid."\">".$row->cmis_vname."</a>",
-        $row->cmis_repositoryId,
-        $row->cmis_objectId,
-        $row->cmis_exclude,
-        date("j F Y", $row->timestamp)
+      $rows[] = array("<a href=\"/admin/cmis/cmis_taxonomy/vocabulary/edit/".$row->cmis_vid."\">".$row->cmis_vname."</a>",
+            $row->cmis_repositoryId,
+            $row->cmis_objectId,
+            $options[$row->cmis_exclude],
+            date("j F Y", $row->timestamp)
       );
     }
   }
@@ -51,25 +51,89 @@ function cmis_taxonomy_vocabulary(){
 
 
 function cmis_taxonomy_vocabulary_admin_form($form, &$form_state) {
+  $query = db_select('cmis_vocab', 'c');
+  $query->condition('c.cmis_vid', arg(5), '=')
+    ->fields('c', array('cmis_vid', 'vid', 'cmis_vname', 'cmis_repositoryId', 'cmis_objectId', 'cmis_exclude', 'timestamp'));
+  $results = $query->execute();
   $form = array();
+  if(!empty($results)) {
+    $form['cmis_taxonomy'] = array();
+    foreach ($results as $row) {
+      $form['cmis_taxonomy']['cmis_vid'] = array(
+        '#type' => 'hidden',
+        '#value' => $row->cmis_vid,
+        '#no_cache' => TRUE,
+      );
+      $form['cmis_taxonomy']['cmis_vname'] = array(
+        '#type' => 'textfield',
+        '#title' => 'CMIS Vocabulary',
+        '#value' => $row->cmis_vname,
+        '#disabled' => TRUE,
+        '#no_cache' => TRUE,
+      );
+      $form['cmis_taxonomy']['cmis_objectId'] = array(
+        '#type' => 'textfield',
+        '#title' => 'CMIS ObjectID',
+        '#value' => $row->cmis_objectId,
+        '#no_cache' => TRUE,
+      );
+      $form['cmis_taxonomy']['cmis_repositoryId'] = array(
+        '#type' => 'textfield',
+        '#title' => 'CMIS RepositoryID',
+        '#value' => $row->cmis_repositoryId,
+        '#no_cache' => TRUE,
+      );
+      $options = array(0 => 'Included', 1 => 'Excluded');
+      $form['cmis_taxonomy']['cmis_exclude'] = array(
+        '#type' => 'select',
+        '#title' => 'CMIS Synced',
+        '#options' => $options,
+        '#default_value' => $row->cmis_exclude,
+        '#no_cache' => TRUE,
+      );
+    }
+    $form['cmis_taxonomy']['actions'] = array('#type' => 'actions');
+    $form['cmis_taxonomy']['actions']['submit'] = array(
+      '#type' => 'submit',
+      '#id' => 'cmis-taxonomy-vocabulary-submit',
+      '#value' => t('Save CMIS Taxonomy Vocabulary Sync'),
+      '#attributes' => array('class' => array('btn','btn-sm','btn-primary')),
+      '#submit' => array('cmis_taxonomy_vocabulary_admin_form_submit'),
+    );
+    $form['cmis_taxonomy']['actions']['cancel'] = array(
+      '#type' => 'link',
+      '#button_type' => 'button',
+      '#title' => t('Cancel'),
+      '#href' => 'admin/cmis/cmis_taxonomy/vocabulary',
+      '#attributes' => array('class' => array('btn','btn-sm','btn-primary'))
+    );
+  }
   return $form;
 }
 /**
  * Form validation
  */
 function cmis_taxonomy_vocabulary_admin_form_validate($form, &$form_state){
-  if ($form_state['values']['vocabulary'] == 'no')
-    form_set_error('vocabulary', '"<b>no</b>" is not a valid answer, try again.');
+  if (empty($form_state['values']['cmis_vid'])){
+    form_set_error('cmis_taxonomy', 'Error Please check Vocabulary ID');
+  }
 }
 
 /**
  * Form submission
  */
 function cmis_taxonomy_vocabulary_admin_form_submit(&$form, &$form_state){
-    //
-    // Here you can perform whatever action that form is made for.
-    //
-    drupal_set_message( 'The form has been sent. "vocabulary" has the following value: '.$form_state['values']['vocabulary'] );
+  $num_updated = db_update('cmis_vocab')
+    ->fields(array(
+      'cmis_repositoryId' => trim($form_state['values']['cmis_repositoryId']),
+      'cmis_objectId' => trim($form_state['values']['cmis_objectId']),
+      'cmis_exclude' => intval($form_state['values']['cmis_exclude']),
+      'timestamp' => REQUEST_TIME
+    ))
+    ->condition('cmis_vid', intval($form_state['values']['cmis_vid']), '=')
+    ->execute();
+  drupal_set_message( 'Vocabulary '.$form_state['values']['cmis_vname'].' has been updated');
+  drupal_goto('admin/cmis/cmis_taxonomy/vocabulary');
 }
 
 /**
