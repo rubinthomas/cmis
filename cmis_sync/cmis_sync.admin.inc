@@ -3,7 +3,7 @@
  * Config sample:
  * Run CMIS Sync Help <a href='admin/help#cmis_sync'>admin/help#cmis_sync</a>
  *
- * 
+ *
  *
  */
 
@@ -48,8 +48,8 @@ function cmis_sync_setting_validate() {
 	}
 	else
 		drupal_set_message(t('Missing Global Configuration [\'cmis_sync_map\']Array in settings.php'), 'error',FALSE);
-	
-	
+
+
 	/*
 	* Test Code for functions written
 	*/
@@ -65,11 +65,11 @@ function cmis_sync_errors_form($form, &$form_state) {
 	$form = array();
 	$ret = "<p>Check all Errored Nodes to see if they are available in Drupal but not in the CMIS Repository</p>"."\n";
 	$ret .= "<p>".date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME'])."</p>"."\n";
-	
+
 	$form['cmis_sync'] = array(
 	  '#markup' => $ret,
       '#title' => t('CMIS Sync Errored Cron')
-    ); 
+    );
     $form['filter'] = array(
       '#type' => 'fieldset',
       '#collapsible' => TRUE,
@@ -103,7 +103,7 @@ function cmis_sync_errors_form($form, &$form_state) {
 	  '#value' => t('Reset'),
 	  '#markup' => l(t('Reset'), 'admin/cmis/cmis_sync/cmis/errors'),
 	);
-  
+
   	$header = array(
 		array('data' => 'CMIS ID', 'field' => 'id', 'sort' => 'ASC'),
 		array('data' => 'Drupal Node ID', 'field' => 'nid', 'sort' => 'ASC'),
@@ -113,12 +113,12 @@ function cmis_sync_errors_form($form, &$form_state) {
 		array('data' => 'Timestamp', 'field' => 'changed_timestamp', 'sort' => 'ASC'),
 	);
 	$query = db_select('cmis_sync_node', 'p')->extend('PagerDefault')->extend('TableSort');
-	
+
 	/*
 	SELECT * FROM cmis_sync_node WHERE nid NOT IN ( SELECT nid FROM node)
 	*/
 	$query->condition('nid', db_select('node','n')->fields('n', array('nid')), 'NOT IN');
-	
+
 	if (isset($form_state['values']['filter_objectId'])) {
       $query->condition('cmis_objectId', '%' . db_like($form_state['values']['filter_objectId']) . '%', 'LIKE');
     }
@@ -128,8 +128,8 @@ function cmis_sync_errors_form($form, &$form_state) {
     if (isset($form_state['values']['filter_nid'])) {
       $query->condition('nid', intval($form_state['values']['filter_nid']), '=');
     }
-	
-	
+
+
 	$results = $query
     ->fields('p', array('id','nid', 'cmis_repositoryId','cmis_objectId','cmis_versionLabel','changed_timestamp'))
     ->orderByHeader($header)
@@ -141,7 +141,7 @@ function cmis_sync_errors_form($form, &$form_state) {
 	if(!empty($results)) {
 		foreach ($results as $row) {
 			$rows[] = array("<a href=\"admin/cmis/cmis_sync/cmis/errors/".$row->id."/edit\">".$row->id."</a>",
-						"<a href=\"/node/".$row->nid."/edit\">".$row->nid."</a>",
+						$row->nid,
 						$row->cmis_repositoryId,
 						$row->cmis_objectId,
 						$row->cmis_versionLabel,
@@ -156,7 +156,7 @@ function cmis_sync_errors_form($form, &$form_state) {
       '#rows' => $rows,
       '#empty' => t('There is no data')
     );
-	
+
     $form['pager'] = array('#markup' => theme('pager'));
 
 	return $form;
