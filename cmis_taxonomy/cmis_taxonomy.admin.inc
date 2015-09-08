@@ -6,7 +6,6 @@
  *
  *
  */
-
 /**
  * @file
  * Admin functions for cmis_taxonomy module.
@@ -24,7 +23,6 @@ function cmis_taxonomy_vocabulary(){
     array('data' => 'Timestamp', 'field' => 'timestamp', 'sort' => 'ASC'),
   );
   $query = db_select('cmis_vocab', 'p')->extend('PagerDefault')->extend('TableSort');
-
   $query->fields('p', array('cmis_vid', 'vid', 'cmis_vname', 'cmis_repositoryId', 'cmis_objectId', 'cmis_exclude','timestamp'))
     ->orderByHeader($header)
     ->orderBy('timestamp', 'DESC')
@@ -97,15 +95,13 @@ function cmis_taxonomy_vocabulary_admin_form($form, &$form_state) {
       '#type' => 'submit',
       '#id' => 'cmis-taxonomy-vocabulary-submit',
       '#value' => t('Save CMIS Taxonomy Vocabulary Sync'),
-      '#attributes' => array('class' => array('btn','btn-sm','btn-primary')),
       '#submit' => array('cmis_taxonomy_vocabulary_admin_form_submit'),
     );
     $form['cmis_taxonomy']['actions']['cancel'] = array(
       '#type' => 'link',
       '#button_type' => 'button',
       '#title' => t('Cancel'),
-      '#href' => 'admin/cmis/cmis_taxonomy/vocabulary',
-      '#attributes' => array('class' => array('btn','btn-sm','btn-primary'))
+      '#href' => '/admin/cmis/cmis_taxonomy/vocabulary',
     );
   }
   return $form;
@@ -132,8 +128,8 @@ function cmis_taxonomy_vocabulary_admin_form_submit(&$form, &$form_state){
     ))
     ->condition('cmis_vid', intval($form_state['values']['cmis_vid']), '=')
     ->execute();
-  drupal_set_message( 'Vocabulary '.$form_state['values']['cmis_vname'].' has been updated');
-  drupal_goto('admin/cmis/cmis_taxonomy/vocabulary');
+  drupal_set_message('Vocabulary '.$form_state['values']['cmis_vname'].' has been updated');
+  drupal_goto('/admin/cmis/cmis_taxonomy/vocabulary');
 }
 
 /**
@@ -172,8 +168,6 @@ function cmis_taxonomy_setting_validate() {
   }
   else
     drupal_set_message(t('Missing Global Configuration [\'cmis_taxonomy\']Array in settings.php'), 'error',FALSE);
-
   return $ret."</div>\n";
 }
 
-?>
