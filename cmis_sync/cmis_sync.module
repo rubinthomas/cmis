@@ -242,22 +242,34 @@ function cmis_sync_menu() {
     'type'             => MENU_NORMAL_ITEM,
     'access arguments' => array('cmis_sync'),
   );
+  $items['admin/cmis/cmis_sync/cmis/%/edit'] = array(
+    'title'            => t('CMIS Document Edit'),
+    'description'      => t('CMIS Sync Nodes Edit'),
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('cmis_sync_admin_form', 4),
+    'access callback'  => array('cmis_sync_access'),
+    'access arguments' => array(4),
+    'file'             => 'cmis_sync.admin.inc',
+    'type'             => MENU_NORMAL_ITEM,
+  );
   $items['admin/cmis/cmis_sync/cmis/errors'] = array(
     'title'            => t('CMIS Sync Error Nodes'),
     'description'      => t('Node Listing of Errored CMIS Document data present in Drupal.'),
     'page callback'    => 'drupal_get_form',
     'page arguments'   => array('cmis_sync_errors_form'),
+    'access arguments' => array('cmis_sync'),
+    'file'             => 'cmis_sync.admin.inc',
     'type'             => MENU_NORMAL_ITEM,
-    'file'             => 'cmis_sync.admin.inc',
-    'access arguments' => array('cmis_sync'),
   );
-  $items['/admin/cmis/cmis_sync/cmis/%/edit'] = array(
-    'title'            => t('CMIS Sync Node Listing'),
-    'description'      => t('Node Listing of CMIS Document data from CMIS Repository into a Drupal Nodes.'),
-    'page callback'    => 'cmis_sync_admin_form',
-    'page arguments'   => array(1),
-    'access arguments' => array('cmis_sync'),
+  $items['admin/cmis/cmis_sync/cmis/errors/%/edit'] = array(
+    'title'            => t('Errored CMIS Document Edit'),
+    'description'      => t('Errored CMIS Sync Nodes Edit'),
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('cmis_sync_errors_delete_form', 5),
+    'access callback'  => array('cmis_sync_access'),
+    'access arguments' => array(5),
     'file'             => 'cmis_sync.admin.inc',
+    'type'             => MENU_NORMAL_ITEM,
   );
   return $items;
 }
