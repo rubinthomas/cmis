@@ -22,14 +22,6 @@ function cmis_taxonomy_uninstall() {
  */
 function cmis_taxonomy_schema() {
   $schema['cmis_taxonomy'] = array(
-    'primary key' => array('cmistxid'),
-    'unique keys' => array(),
-    'indexes' => array(
-      'cmis_tx_repo' => array('cmis_repositoryId'),
-      'cmis_tx_obj' => array('cmis_objectId'),
-      'cmis_tx_vid' => array('vid'),
-      'cmis_tx_tid' => array('tid')
-    )
     'fields' => array(
       'cmistxid'  => array(
         'type' => 'serial',
@@ -108,16 +100,17 @@ function cmis_taxonomy_schema() {
         'description' => t('The most recent time the drupal node has been saved/synchronized'),
       )
     ),
+    'primary key' => array('cmistxid'),
+    'unique keys' => array(),
+    'indexes' => array(
+      'cmis_tx_repo' => array('cmis_repositoryId'),
+      'cmis_tx_obj' => array('cmis_objectId'),
+      'cmis_tx_vid' => array('vid'),
+      'cmis_tx_tid' => array('tid')
+    ),
   );
 
   $schema['cmis_vocab'] = array(
-    'unique keys' => array(),
-    'indexes' => array(
-      'cmis_vb_repo' => array('cmis_repositoryId'),
-      'cmis_vb_obj' => array('cmis_objectId'),
-      'cmis_vb_vid' => array('vid')
-    ),
-    'primary key' => array('cmis_vid'),
     'fields' => array(
       'cmis_vid'  => array(
         'type' => 'serial',
@@ -168,9 +161,17 @@ function cmis_taxonomy_schema() {
         'description' => t('The most recent time the drupal node has been saved/synchronized'),
       )
     ),
+    'primary key' => array('cmis_vid'),
+    'unique keys' => array(
+    ),
+    'indexes' => array(
+      'cmis_vb_repo' => array('cmis_repositoryId'),
+      'cmis_vb_obj' => array('cmis_objectId'),
+      'cmis_vb_vid' => array('vid')
+    ),
   );
   db_update('system')
-    ->expression('weight', ':weight', array(':weight' => 5))
+    ->expression('weight', 5)
     ->condition('name', 'cmis_taxonomy')
     ->condition('type', 'module')
     ->execute();
@@ -183,5 +184,3 @@ function cmis_taxonomy_schema() {
 function cmis_taxonomy_install() {
   cmis_taxonomy_schema();
 }
-
-?>
