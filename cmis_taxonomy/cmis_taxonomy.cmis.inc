@@ -87,10 +87,9 @@ function cmis_taxonomy_drupal_delete($repository, $taxonomy, $taxonomy) {
       if (taxonomy_load($cmis_tax->tid))
         $cmis_taxonomies[$cmis_tax->cmis_objectId] = $cmis_tax->tid;
     }
-    $cmis_tax_objectIds = array_keys($cmis_taxonomies);
     // Identify Existing CMIS Category objects in the Repo before Drupal Local DELETE
-    if (!empty($cmis_tax_objectIds)) {
-      $cmis_objects = cmisapi_query($repository->repositoryId, sprintf('SELECT cmis:objectId FROM %s WHERE cmis:objectId IN (\'%s\')', $taxonomy['cmis_type'], join('\',\'', $cmis_tax_objectIds)));
+    if (array_keys($cmis_taxonomies)) {
+      $cmis_objects = cmisapi_query($repository->repositoryId, sprintf('SELECT cmis:objectId FROM %s WHERE cmis:objectId IN (\'%s\')', $taxonomy['cmis_type'], join('\',\'', array_keys($cmis_taxonomies))));
       foreach ($cmis_objects->objectList as $cmis_object) {
         if (array_key_exists($cmis_object->id, $cmis_taxonomies))
           unset($cmis_taxonomies[$cmis_object->id]);
@@ -101,10 +100,10 @@ function cmis_taxonomy_drupal_delete($repository, $taxonomy, $taxonomy) {
       db_delete('cmis_taxonomy')
         ->condition('tid', array_values($cmis_taxonomies), 'IN')
         ->execute();
+        // delete Drupal Taxonomy
       foreach ($cmis_taxonomies as $cmis_objectId => $drupal_tid)
         taxonomy_delete($drupal_tid);
     }
   }
 }
-
 ?>
