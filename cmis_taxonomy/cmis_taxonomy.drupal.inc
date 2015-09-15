@@ -119,4 +119,3 @@ function cmis_taxonomy_lookup_term($cat_objId=NULL) {
     return NULL;
 }
 
-?>
